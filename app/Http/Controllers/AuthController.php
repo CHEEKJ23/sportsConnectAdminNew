@@ -1,61 +1,114 @@
 <?php
 
 namespace App\Http\Controllers;
-namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use DB;
-use Session;
-use Auth;
-use App\Models\employee;
-use App\Models\trainingEvent;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function register(Request $req)
+    /**
+     * Registers a user
+     *
+     * @param RegisterRequest $request
+     * @return JsonResponse
+     */
+    public function register(RegisterRequest $request): JsonResponse
     {
-        //valdiate
-        $rules = [
-            'name' => 'required|string',
-            'email' => 'required|string|unique:users',
-            'password' => 'required|string|min:6'
-        ];
-        $validator = Validator::make($req->all(), $rules);
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-        //create new user in users table
-        $user = User::create([
-            'name' => $req->name,
-            'email' => $req->email,
-            'password' => Hash::make($req->password)
-        ]);
-        $token = $user->createToken('Personal Access Token')->plainTextToken;
-        $response = ['user' => $user, 'token' => $token];
-        return response()->json($response, 200);
+        $data = $request->validated();
+        $data['password'] = Hash::make($data['password']);
+        $data['name'] = strstr($data['email'], '@', true);
+
+        $user = User::create($data);
+        $token = $user->createToken(User::USER_TOKEN);
+
+        return $this->success([
+            'user' => $user,
+            'token' => $token->plainTextToken,
+        ], 'User has been register successfully.');
+
     }
 
-    public function login(Request $req)
+    /**
+     * Logins a user
+     *
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $request): JsonResponse
     {
-        // validate inputs
-        $rules = [
-            'email' => 'required',
-            'password' => 'required|string'
-        ];
-        $req->validate($rules);
-        // find user email in users table
-        $user = User::where('email', $req->email)->first();
-        // if user email found and password is correct
-        if ($user && Hash::check($req->password, $user->password)) {
-            $token = $user->createToken('Personal Access Token')->plainTextToken;
-            $response = ['user' => $user, 'token' => $token];
-            return response()->json($response, 200);
+        $isValid = $this->isValidCredential($request);
+
+        if (!$isValid['success']) {
+            return $this->error($isValid['message'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-        $response = ['message' => 'Incorrect email or password'];
-        return response()->json($response, 400);
+
+        $user = $isValid['user'];
+        $token = $user->createToken(User::USER_TOKEN);
+
+        return $this->success([
+            'user' => $user,
+            'token' => $token->plainTextToken
+        ], 'Login successfully!');
+
+    }
+
+    /**
+     * Validates user credential
+     *
+     * @param LoginRequest $request
+     * @return array
+     */
+    private function isValidCredential(LoginRequest $request) : array
+    {
+        $data = $request->validated();
+
+        $user = User::where('email', $data['email'])->first();
+        if ($user === null) {
+            return [
+                'success' => false,
+                'message' => 'Invalid Credential'
+            ];
+        }
+
+        if (Hash::check($data['password'], $user->password)) {
+            return [
+                'success' => true,
+                'user' => $user
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Password is not matched',
+        ];
+
+    }
+
+    /**
+     * Logins a user with token
+     *
+     * @return JsonResponse
+     */
+    public function loginWithToken() : JsonResponse
+    {
+        return $this->success(auth()->user(),'Login successfully!');
+    }
+
+    /**
+     * Logouts a user
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logout(Request $request) : JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+        return $this->success(null,'Logout successfully!');
     }
 }
