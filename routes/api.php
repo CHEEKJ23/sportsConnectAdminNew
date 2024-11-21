@@ -6,9 +6,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatMessageController;
+use App\Http\Controllers\BookingController;
 
 
 
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -46,7 +48,11 @@ Route::prefix('auth')
         Route::apiResource('chat', ChatController::class)->only(['index','store','show']);
         Route::apiResource('chat_message', ChatMessageController::class)->only(['index','store']);
         Route::apiResource('user', UserController::class)->only(['index']);
+        Route::post('/search-sport-centers', [BookingController::class, 'searchSportCenters']);
+        Route::post('/sport-center/{sportCenterId}/available-courts', [BookingController::class, 'getAvailableCourts']);
+        Route::post('/book-court', [BookingController::class, 'bookCourt']);
     
     });
+
 
 

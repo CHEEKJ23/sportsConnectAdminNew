@@ -36,4 +36,12 @@ class User extends Authenticatable
         $this->notify(new MessageSent($data));
     }
 
+    /**
+     * Get all bookings made by this user.
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'user_id');
+    }
+
 }
