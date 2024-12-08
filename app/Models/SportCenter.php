@@ -31,4 +31,20 @@ class SportCenter extends Model
     {
         return $this->hasMany(Booking::class, 'sport_center_id');
     }
+    
+/**
+     * Define relationship: SportCenter has many equipment rentals.
+     */
+    
+    public function equipmentRentals()
+    {
+        return $this->hasMany(EquipmentRental::class, 'sport_center_id');
+    }
+/**
+     * Define relationship: SportCenter has many equipment items.
+     */
+    public function equipment()
+    {
+        return $this->hasMany(Equipment::class, 'sport_center_id');
+    }
 }

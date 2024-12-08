@@ -35,6 +35,7 @@ class Court extends Model
     {
         return !$this->bookings()
             ->where('date', $date)
+            // ->where('status', 'pending') // Only consider confirmed bookings
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->whereBetween('startTime', [$startTime, $endTime])
                       ->orWhereBetween('endTime', [$startTime, $endTime]);

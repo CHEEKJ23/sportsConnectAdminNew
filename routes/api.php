@@ -7,6 +7,8 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\EquipmentRentalController;
+
 
 
 
@@ -44,14 +46,21 @@ Route::prefix('auth')
     });
 
     Route::middleware('auth:sanctum')->group(function (){
-
+        //chat
         Route::apiResource('chat', ChatController::class)->only(['index','store','show']);
         Route::apiResource('chat_message', ChatMessageController::class)->only(['index','store']);
         Route::apiResource('user', UserController::class)->only(['index']);
+        //book court
         Route::post('/search-sport-centers', [BookingController::class, 'searchSportCenters']);
         Route::post('/sport-center/{sportCenterId}/available-courts', [BookingController::class, 'getAvailableCourts']);
         Route::post('/book-court', [BookingController::class, 'bookCourt']);
-    
+        Route::get('/myBookings', [BookingController::class, 'getMyBookings']);
+        Route::put('/modifyBookings/{bookingId}', [BookingController::class, 'updateBooking']);
+        //equipment rental
+        Route::post('/equipment-rental/check-availability', [EquipmentRentalController::class, 'checkAvailability']);
+        Route::get('/equipment-rental/get-sports-centers', [EquipmentRentalController::class, 'getSportsCentersByLocation']);
+        Route::get('/equipment-rental/equipment/{equipmentID}', [EquipmentRentalController::class, 'getEquipmentDetails']);
+        Route::post('/equipment-rental/rent', [EquipmentRentalController::class, 'rentEquipment']);
     });
 
 
