@@ -1,7 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ChatMessageController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\EquipmentRentalController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -38,3 +45,7 @@ Route::get('/admin/user-list',[App\Http\Controllers\UserController::class, 'show
 Route::post('/admin/user-list/search',[App\Http\Controllers\UserController::class, 'userSearch'])->name('userSearch');
 
 Route::get('/admin/user-list/remove/User/{id}', [App\Http\Controllers\UserController::class, 'deleteUser'])->name('deleteUser');
+
+Route::post('/admin/rentals/complete-return', [EquipmentRentalController::class, 'completeReturn'])->name('completeReturn');
+
+Route::get('/admin/rental-returns', [EquipmentRentalController::class, 'showReturnRequests'])->name('rentalReturns');

@@ -61,6 +61,8 @@ Route::prefix('auth')
         Route::get('/equipment-rental/get-sports-centers', [EquipmentRentalController::class, 'getSportsCentersByLocation']);
         Route::get('/equipment-rental/equipment/{equipmentID}', [EquipmentRentalController::class, 'getEquipmentDetails']);
         Route::post('/equipment-rental/rent', [EquipmentRentalController::class, 'rentEquipment']);
+        Route::get('/equipment-rental/my-rentals', [EquipmentRentalController::class, 'getMyRentals']);
+        Route::post('/rentals/return-request', [EquipmentRentalController::class, 'receiveReturnRequest']);
     });
 
 

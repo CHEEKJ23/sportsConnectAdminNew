@@ -329,7 +329,7 @@ return [
         ],
         ['header' => 'account_settings'],
         [
-            'text' => 'profile',
+            'text' => 'Null',
             'url' => 'admin/settings',
             'icon' => 'fas fa-fw fa-user',
         ],
@@ -339,8 +339,8 @@ return [
             'icon' => 'fas fa-fw fa-user',
         ],
         [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
+            'text' => 'Manage Rental',
+            'url' => 'admin/rental-returns',
             'icon' => 'fas fa-fw fa-lock',
         ],
         [

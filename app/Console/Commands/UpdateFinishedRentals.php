@@ -15,26 +15,26 @@ class UpdateFinishedRentals extends Command
     public function handle()
     {
        
-        $now = Carbon::now();
+        // $now = Carbon::now();
 
      
-        $rentals = EquipmentRental::where('endTime', '<=', $now)
-            ->where('rentalStatus', '!=', 'Finished')
-            ->get();
+        // $rentals = EquipmentRental::where('endTime', '<=', $now)
+        //     ->where('rentalStatus', '!=', 'Finished')
+        //     ->get();
 
-        foreach ($rentals as $rental) {
+        // foreach ($rentals as $rental) {
       
-            $equipment = Equipment::find($rental->equipmentID);
+        //     $equipment = Equipment::find($rental->equipmentID);
 
-            if ($equipment) {
+        //     if ($equipment) {
            
-                $equipment->increment('quantity_available', $rental->quantity_rented);
+        //         $equipment->increment('quantity_available', $rental->quantity_rented);
 
              
-                $rental->update(['rentalStatus' => 'Finished']);
-            }
-        }
+        //         $rental->update(['rentalStatus' => 'Finished']);
+        //     }
+        // }
 
-        $this->info('Finished rentals updated successfully.');
+        // $this->info('Finished rentals updated successfully.');
     }
 }

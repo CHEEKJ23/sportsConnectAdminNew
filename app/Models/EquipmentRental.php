@@ -35,9 +35,23 @@ class EquipmentRental extends Model
 
     public function user()
     {
-        // return $this->belongsTo(User::class, 'userID');
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'userID');
+        // return $this->belongsTo(User::class);
 
 
+    }
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($rental) {
+            // Find the equipment
+            $equipment = Equipment::find($rental->equipmentID);
+
+            if ($equipment) {
+                // Increment the available quantity
+                $equipment->increment('quantity_available', $rental->quantity_rented);
+            }
+        });
     }
 }
