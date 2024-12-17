@@ -327,17 +327,18 @@ return [
             'label' => 4,
             'label_color' => 'success',
         ],
-        ['header' => 'account_settings'],
-        [
-            'text' => 'Null',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
-        ],
+        ['header' => 'Actions'],
         [
             'text' => 'User List',
             'url' => 'admin/user-list',
             'icon' => 'fas fa-fw fa-user',
         ],
+        [
+            'text' => 'Manage Deals',
+            'url' => 'admin/manage-deals',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+     
         [
             'text' => 'Manage Rental',
             'url' => 'admin/rental-returns',

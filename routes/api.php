@@ -8,6 +8,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\EquipmentRentalController;
+use App\Http\Controllers\DealsController;
+use App\Http\Controllers\ActivityController;
 
 
 
@@ -63,7 +65,21 @@ Route::prefix('auth')
         Route::post('/equipment-rental/rent', [EquipmentRentalController::class, 'rentEquipment']);
         Route::get('/equipment-rental/my-rentals', [EquipmentRentalController::class, 'getMyRentals']);
         Route::post('/rentals/return-request', [EquipmentRentalController::class, 'receiveReturnRequest']);
+        //deals
+        Route::post('/create/deals', [DealsController::class, 'createDeal']);
+        Route::post('/edit/deals/{dealID}', [DealsController::class, 'editDeal']);
+        Route::delete('/delete/deals/{dealID}', [DealsController::class, 'deleteDeal']);
+        Route::get('/view/deals', [DealsController::class, 'viewAllDeals']);
+        Route::get('/view/my-deals', [DealsController::class, 'viewMyDeals']);
+        //activities
+        Route::post('/create/activities', [ActivityController::class, 'createActivity']);
+        Route::post('/join/activities/{activityId}', [ActivityController::class, 'joinActivity']);
+        Route::get('/activities', [ActivityController::class, 'getActivity']);
+
     });
 
 
 
+
+
+    

@@ -41,4 +41,9 @@ class Booking extends Model
     {
         return $this->belongsTo(Court::class, 'court_id');
     }
+
+    public function activity()
+    {
+        return $this->belongsTo(Activity::class);
+    }
 }

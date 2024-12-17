@@ -67,25 +67,7 @@ class BookingController extends Controller
     return response()->json($availableCourts);
 }
      
-    //  public function bookCourt(Request $request)
-    //  {
-    //      $validated = $request->validate([
-    //          'user_id' => 'required|exists:users,id',
-    //          'sport_center_id' => 'required|exists:sport_centers,id',
-    //          'court_id' => 'required|exists:courts,id',
-    //          'date' => 'required|date',
-    //          'startTime' => 'required|date_format:H:i',
-    //          'endTime' => 'required|date_format:H:i|after:startTime',
-    //      ]);
- 
-        
-    //      $booking = Booking::create($validated);
- 
-        
-    //      Court::where('id', $validated['court_id'])->update(['availability' => false]);
- 
-    //      return response()->json(['message' => 'Booking successful', 'booking' => $booking]);
-    //  }
+
 
     // Step 3: Book a court
     public function bookCourt(Request $request)

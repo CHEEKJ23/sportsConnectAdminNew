@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\EquipmentRentalController;
+use App\Http\Controllers\DealsController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -49,3 +50,9 @@ Route::get('/admin/user-list/remove/User/{id}', [App\Http\Controllers\UserContro
 Route::post('/admin/rentals/complete-return', [EquipmentRentalController::class, 'completeReturn'])->name('completeReturn');
 
 Route::get('/admin/rental-returns', [EquipmentRentalController::class, 'showReturnRequests'])->name('rentalReturns');
+
+Route::put('/admin/deals/{dealID}/approve', [DealsController::class, 'approveDeal'])->name('approveDeal');
+
+Route::put('/admin/deals/{dealID}/reject', [DealsController::class, 'rejectDeal'])->name('rejectDeal');
+
+Route::get('/admin/manage-deals', [DealsController::class, 'showDeals'])->name('showDeals');
