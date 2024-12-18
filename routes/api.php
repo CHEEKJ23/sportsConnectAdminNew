@@ -71,10 +71,17 @@ Route::prefix('auth')
         Route::delete('/delete/deals/{dealID}', [DealsController::class, 'deleteDeal']);
         Route::get('/view/deals', [DealsController::class, 'viewAllDeals']);
         Route::get('/view/my-deals', [DealsController::class, 'viewMyDeals']);
+
+        
         //activities
         Route::post('/create/activities', [ActivityController::class, 'createActivity']);
+        Route::get('/available-sport-types/{sportCenterId}', [ActivityController::class, 'getAvailableSportTypes']);
         Route::post('/join/activities/{activityId}', [ActivityController::class, 'joinActivity']);
-        Route::get('/activities', [ActivityController::class, 'getActivity']);
+        //get activities
+        Route::get('/activities/specific', [ActivityController::class, 'getSpecificActivity']);
+        Route::get('/activities/others', [ActivityController::class, 'getAllActivitiesExceptUser']);
+        Route::get('/activities/mine', [ActivityController::class, 'getUserActivities']);
+
 
     });
 

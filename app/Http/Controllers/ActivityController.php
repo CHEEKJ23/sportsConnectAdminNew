@@ -106,8 +106,23 @@ if ($currentPlayers >= $activity->player_quantity) {
 
     return response()->json(['message' => 'Joined activity successfully', 'activity' => $activity], 200);
 }
+//get specific activity
+// public function getSpecificActivity(Request $request)
+// {
+//     $activities = Activity::with(['creator', 'sportCenter'])
+//         ->when($request->input('sportType'), function ($query, $sportType) {
+//             $query->where('sportType', $sportType);
+//         })
+//         ->when($request->input('location'), function ($query, $location) {
+//             $query->whereHas('sportCenter', function ($subQuery) use ($location) {
+//                 $subQuery->where('location', $location);
+//             });
+//         })
+//         ->get();
 
-public function getActivity(Request $request)
+//     return response()->json($activities, 200);
+// }
+public function getSpecificActivity(Request $request)
 {
     $activities = Activity::with(['creator', 'sportCenter'])
         ->when($request->input('sportType'), function ($query, $sportType) {
@@ -118,11 +133,55 @@ public function getActivity(Request $request)
                 $subQuery->where('location', $location);
             });
         })
-        ->when($request->input('date'), function ($query, $date) {
-            $query->where('date', $date);
-        })
+        ->select('activities.*', 'sport_centers.name as sport_center_name', 'sport_centers.location as sport_center_location', 'users.name as creator_name')
+        ->join('sport_centers', 'activities.sport_center_id', '=', 'sport_centers.id')
+        ->join('users', 'activities.user_id', '=', 'users.id')
         ->get();
 
     return response()->json($activities, 200);
+}
+
+
+   // Show all activities except those created by the current user
+   public function getAllActivitiesExceptUser(Request $request)
+   {
+       $userId = $request->user()->id; // Get the authenticated user's ID
+   
+       $activities = Activity::where('activities.user_id', '!=', $userId)
+                             ->join('sport_centers', 'activities.sport_center_id', '=', 'sport_centers.id')
+                             ->join('users', 'activities.user_id', '=', 'users.id')
+                             ->select('activities.*', 'sport_centers.name as sport_center_name', 'sport_centers.location as sport_center_location', 'users.name as creator_name')
+                             ->get();
+   
+       return response()->json($activities, 200);
+   }
+
+   // Show all activities created by the current user
+   public function getUserActivities(Request $request)
+{
+    $userId = $request->user()->id; // Get the authenticated user's ID
+
+    $activities = Activity::where('activities.user_id', $userId)
+                          ->join('sport_centers', 'activities.sport_center_id', '=', 'sport_centers.id')
+                          ->select('activities.*', 'sport_centers.name as sport_center_name', 'sport_centers.location as sport_center_location')
+                          ->get();
+
+    return response()->json($activities, 200);
+}
+
+
+// Fetch sport centers by location
+//use equipment rental controller 
+//use equipment rental controller 
+//use equipment rental controller 
+
+// Fetch available sport types at a sport center
+public function getAvailableSportTypes(Request $request, $sportCenterId)
+{
+    $sportTypes = Court::where('sport_center_id', $sportCenterId)
+                       ->distinct()
+                       ->pluck('type');
+
+    return response()->json($sportTypes);
 }
 }

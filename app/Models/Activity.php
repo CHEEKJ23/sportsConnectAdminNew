@@ -36,6 +36,6 @@ class Activity extends Model
     // Define relationship with the sport center
     public function sportCenter()
     {
-        return $this->belongsTo(SportCenter::class);
+        return $this->belongsTo(SportCenter::class, 'sport_center_id');
     }
 }
