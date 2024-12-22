@@ -7,7 +7,7 @@ use App\Models\SportCenter;
 use App\Models\Equipment;
 use App\Models\EquipmentRental;
 use App\Models\User;
-
+use App\Models\UserPoints;
 use Illuminate\Support\Facades\Auth;
 
 class EquipmentRentalController extends Controller
@@ -149,9 +149,22 @@ class EquipmentRentalController extends Controller
             'rentalStatus' => 'Ongoing',
         ]);
         $equipment->decrement('quantity_available', $request->quantity_rented);
+        $this->awardPoints($request->user_id, 10); 
+
         return response()->json(['message' => 'Rental created successfully', 'rental' => $rental], 201);
     }
-
+// Helper function to award points
+// Helper function to award points
+// Helper function to award points
+private function awardPoints($userId, $points)
+{
+    $userPoints = UserPoints::firstOrCreate(['user_id' => $userId]);
+    $userPoints->points += $points;
+    $userPoints->save();
+}
+// Helper function to award points
+// Helper function to award points
+// Helper function to award points
     public function getMyRentals(Request $request)
 {
     $userId = $request->user()->id;

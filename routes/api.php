@@ -10,7 +10,8 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\EquipmentRentalController;
 use App\Http\Controllers\DealsController;
 use App\Http\Controllers\ActivityController;
-
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\RewardController;
 
 
 
@@ -72,7 +73,7 @@ Route::prefix('auth')
         Route::get('/view/deals', [DealsController::class, 'viewAllDeals']);
         Route::get('/view/my-deals', [DealsController::class, 'viewMyDeals']);
 
-        
+
         //activities
         Route::post('/create/activities', [ActivityController::class, 'createActivity']);
         Route::get('/available-sport-types/{sportCenterId}', [ActivityController::class, 'getAvailableSportTypes']);
@@ -81,10 +82,23 @@ Route::prefix('auth')
         Route::get('/activities/specific', [ActivityController::class, 'getSpecificActivity']);
         Route::get('/activities/others', [ActivityController::class, 'getAllActivitiesExceptUser']);
         Route::get('/activities/mine', [ActivityController::class, 'getUserActivities']);
+        Route::get('/activities/joined', [ActivityController::class, 'getJoinedActivities']);
 
+        //delete activity and unjoin activity
+        Route::delete('/activities/cancel/{activityId}', [ActivityController::class, 'cancelActivity']);
+        Route::delete('/activities/unjoin/{activityId}', [ActivityController::class, 'unjoinActivity']);
 
+        // Users can send feedback
+        Route::post('/post/feedback', [FeedbackController::class, 'store']); // Create feedback
+        // Users can view all feedback and admin replies
+        Route::get('/get/feedback', [FeedbackController::class, 'userFeedback']); // List feedback for the user
+
+        //reward
+        Route::get('/view/points', [RewardController::class, 'getUserPoints']);
+        Route::get('/view/gifts', [RewardController::class, 'getGifts']);
+        Route::post('/redeem/gift', [RewardController::class, 'redeemGift']);
     });
-
+    
 
 
 

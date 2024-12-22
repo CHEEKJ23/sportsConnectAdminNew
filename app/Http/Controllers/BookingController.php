@@ -11,7 +11,7 @@ use App\Models\SportCenter;
 use App\Models\User;
 use App\Models\Booking; 
 use Illuminate\Http\JsonResponse;
-
+use App\Models\UserPoints;
 class BookingController extends Controller
 {
      // Step 1: Search for available sports centers
@@ -105,8 +105,23 @@ class BookingController extends Controller
     $validatedData['status'] = 'confirmed';
     $booking = Booking::create($validatedData);
 
+    $this->awardPoints($validatedData['user_id'], 10); 
+
     return response()->json(['message' => 'Court booked successfully', 'booking' => $booking], 201);
 }
+
+// Helper function to award points
+// Helper function to award points
+// Helper function to award points
+private function awardPoints($userId, $points)
+{
+    $userPoints = UserPoints::firstOrCreate(['user_id' => $userId]);
+    $userPoints->points += $points;
+    $userPoints->save();
+}
+// Helper function to award points
+// Helper function to award points
+// Helper function to award points
 
 public function getMyBookings(Request $request) {
     $userId = $request->user()->id;

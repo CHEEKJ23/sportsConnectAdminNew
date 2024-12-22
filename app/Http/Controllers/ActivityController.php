@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Activity;
 use App\Models\Court;
 use App\Models\Booking;
-
+use App\Models\User;
+use App\Models\UserPoints;
 use Illuminate\Http\Request;
 
 class ActivityController extends Controller
@@ -24,10 +25,28 @@ class ActivityController extends Controller
         ]);
 
         $activity = Activity::create($validated);
+        $this->awardPoints($validatedData['user_id'], 10); 
 
         return response()->json(['message' => 'Activity created successfully', 'activity' => $activity], 201);
     }
 
+// Helper function to award points
+// Helper function to award points
+// Helper function to award points
+private function awardPoints($userId, $points)
+{
+    $userPoints = UserPoints::firstOrCreate(['user_id' => $userId]);
+    $userPoints->points += $points;
+    $userPoints->save();
+}
+// Helper function to award points
+// Helper function to award points
+// Helper function to award points
+
+    
+//join activity
+//join activity
+//join activity
     public function joinActivity(Request $request, $activityId)
 {
     $validated = $request->validate([
@@ -74,6 +93,7 @@ if ($currentPlayers >= $activity->player_quantity) {
     // Update activity status to confirmed
     $activity->status = 'confirmed';
     $activity->save();
+    $this->awardPoints($validated['user_id'], 10); 
 
     // Find an available court
     $court = Court::where('sport_center_id', $activity->sport_center_id)
@@ -124,6 +144,7 @@ if ($currentPlayers >= $activity->player_quantity) {
 // }
 public function getSpecificActivity(Request $request)
 {
+    $userId = $request->user()->id; 
     $activities = Activity::with(['creator', 'sportCenter'])
         ->when($request->input('sportType'), function ($query, $sportType) {
             $query->where('sportType', $sportType);
@@ -133,6 +154,7 @@ public function getSpecificActivity(Request $request)
                 $subQuery->where('location', $location);
             });
         })
+        ->where('activities.user_id', '!=', $userId) 
         ->select('activities.*', 'sport_centers.name as sport_center_name', 'sport_centers.location as sport_center_location', 'users.name as creator_name')
         ->join('sport_centers', 'activities.sport_center_id', '=', 'sport_centers.id')
         ->join('users', 'activities.user_id', '=', 'users.id')
@@ -165,7 +187,12 @@ public function getSpecificActivity(Request $request)
                           ->join('sport_centers', 'activities.sport_center_id', '=', 'sport_centers.id')
                           ->select('activities.*', 'sport_centers.name as sport_center_name', 'sport_centers.location as sport_center_location')
                           ->get();
-
+                          $activities->each(function ($activity) {
+                            $activity->players = User::join('activity_user', 'users.id', '=', 'activity_user.user_id')
+                                                     ->where('activity_user.activity_id', $activity->id)
+                                                     ->select('users.id', 'users.name')
+                                                     ->get();
+                        });
     return response()->json($activities, 200);
 }
 
@@ -183,5 +210,72 @@ public function getAvailableSportTypes(Request $request, $sportCenterId)
                        ->pluck('type');
 
     return response()->json($sportTypes);
+}
+
+// Show activities the user has joined and other users who joined
+// Show activities the user has joined and other users who joined
+public function getJoinedActivities(Request $request)
+   {
+    //    $userId = $request->user()->id;
+    //     $activities = Activity::whereHas('players', function ($query) use ($userId) {
+    //                            $query->where('user_id', $userId);
+    //                        })
+    //                        ->with(['players' => function ($query) {
+    //                            $query->select('users.id', 'users.name');
+    //                        }])
+    //                        ->get();
+    //     return response()->json($activities, 200);
+    $userId = $request->user()->id; 
+    $activities = Activity::join('activity_user', 'activities.id', '=', 'activity_user.activity_id')
+                         ->join('sport_centers', 'activities.sport_center_id', '=', 'sport_centers.id')
+                         ->where('activity_user.user_id', $userId)
+                         ->select(
+                             'activities.*',
+                             'sport_centers.name as sport_center_name',
+                             'sport_centers.location as sport_center_location'
+                         )
+                         ->distinct()
+                         ->get();
+    // Fetch players for each activity
+   $activities->each(function ($activity) {
+       $activity->players = User::join('activity_user', 'users.id', '=', 'activity_user.user_id')
+                                ->where('activity_user.activity_id', $activity->id)
+                                ->select('users.id', 'users.name')
+                                ->get();
+   });
+    return response()->json($activities, 200);
+   }
+
+//cancel activity that the user has created
+public function cancelActivity(Request $request, $activityId) {
+
+   $userId = $request->user()->id; // Get the authenticated user's ID
+    // Find the activity
+   $activity = Activity::where('id', $activityId)
+                       ->where('user_id', $userId) 
+                       ->first();
+    if (!$activity) {
+       return response()->json(['message' => 'Activity not found or you do not have permission to cancel it'], 404);
+   }
+    // Delete the activity
+   $activity->delete();
+    return response()->json(['message' => 'Activity cancelled successfully'], 200);
+}
+
+//unjoin activity that the user has joined
+public function unjoinActivity(Request $request, $activityId) {
+
+   $userId = $request->user()->id; // Get the authenticated user's ID
+    // Check if the user is part of the activity
+   $activity = Activity::whereHas('players', function ($query) use ($userId, $activityId) {
+                           $query->where('user_id', $userId)
+                                 ->where('activity_id', $activityId);
+                       })->first();
+    if (!$activity) {
+       return response()->json(['message' => 'You are not part of this activity'], 404);
+   }
+    // Detach the user from the activity
+   $activity->players()->detach($userId);
+    return response()->json(['message' => 'Successfully unjoined the activity'], 200);
 }
 }

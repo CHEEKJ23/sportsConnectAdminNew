@@ -10,6 +10,9 @@ use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\EquipmentRentalController;
 use App\Http\Controllers\DealsController;
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\RewardController;
+use App\Http\Controllers\GiftController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -56,3 +59,45 @@ Route::put('/admin/deals/{dealID}/approve', [DealsController::class, 'approveDea
 Route::put('/admin/deals/{dealID}/reject', [DealsController::class, 'rejectDeal'])->name('rejectDeal');
 
 Route::get('/admin/manage-deals', [DealsController::class, 'showDeals'])->name('showDeals');
+
+// Admin can view all feedback
+Route::get('/admin/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
+// Admin can reply to a specific feedback
+Route::post('/admin/feedback/{id}/reply', [FeedbackController::class, 'reply'])->name('feedback.reply');
+
+
+//reward
+//reward
+//reward
+//reward
+//reward
+//reward
+//reward
+//reward
+//reward
+//reward
+Route::get('/admin/redemptions', [RewardController::class, 'viewRedemptions']);
+
+Route::post('/admin/redemptions/{id}/status', [RewardController::class, 'updateRedemptionStatus']);
+
+//gift
+//gift
+//gift
+//gift
+//gift
+//gift
+//gift
+//gift
+//gift
+//gift
+Route::get('/admin/view/gifts', [GiftController::class, 'index'])->name('admin.gifts.index');
+
+Route::get('/admin/create/gifts', [GiftController::class, 'create'])->name('admin.gifts.create');
+
+Route::post('/admin/store/gifts', [GiftController::class, 'store'])->name('admin.gifts.store');
+
+Route::get('/admin/gifts/edit/{id}', [GiftController::class, 'edit'])->name('admin.gifts.edit');
+
+Route::put('/admin/gifts/update/{id}', [GiftController::class, 'update'])->name('admin.gifts.update');
+
+Route::delete('/admin/gifts/delete/{id}', [GiftController::class, 'destroy'])->name('admin.gifts.destroy');

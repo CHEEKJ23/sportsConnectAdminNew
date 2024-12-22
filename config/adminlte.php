@@ -336,21 +336,28 @@ return [
         [
             'text' => 'Manage Deals',
             'url' => 'admin/manage-deals',
-            'icon' => 'fas fa-fw fa-user',
+            'icon' => 'fas fa-fw fa-comment',
         ],
      
         [
             'text' => 'Manage Rental',
             'url' => 'admin/rental-returns',
-            'icon' => 'fas fa-fw fa-lock',
+            'icon' => 'fas fa-fw fa-calendar',
         ],
         [
-            'text' => 'multilevel',
+            'text' => 'Manage Feedback',
+            'url' => 'admin/feedback',
             'icon' => 'fas fa-fw fa-share',
+        ],
+        [
+            'text' => 'Redeem & Gift',
+            'icon' => 'fas fa-fw fa-gift',
             'submenu' => [
                 [
-                    'text' => 'level_one',
-                    'url' => '#',
+                    'text' => 'Gift Management',
+                    'url' => 'admin/view/gifts',
+                    'icon' => 'fas fa-fw fa-smile',
+
                 ],
                 [
                     'text' => 'level_one',

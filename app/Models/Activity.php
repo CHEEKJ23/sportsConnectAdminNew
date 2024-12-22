@@ -38,4 +38,6 @@ class Activity extends Model
     {
         return $this->belongsTo(SportCenter::class, 'sport_center_id');
     }
+
+    
 }
