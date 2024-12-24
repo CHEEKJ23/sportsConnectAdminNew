@@ -46,7 +46,7 @@
                                     @if(filter_var($deal->image_path, FILTER_VALIDATE_URL))
                                         <img src="{{ $deal->image_path }}" alt="Deal Image" style="max-width: 100px;">
                                     @else
-                                        <img src="{{ asset('storage/' . $deal->image_path) }}" alt="Deal Image" style="max-width: 100px;">
+                                        <img src="{{ asset('images/' . $deal->image_path) }}" alt="Deal Image" style="max-width: 100px;">
                                     @endif
                                 @else
                                     No Image

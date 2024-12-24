@@ -44,4 +44,8 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'user_id');
     }
 
+    public function redemptions()
+    {
+        return $this->hasMany(RedemptionRequest::class, 'user_id');
+    }
 }

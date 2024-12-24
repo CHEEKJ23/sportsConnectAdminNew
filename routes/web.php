@@ -13,6 +13,9 @@ use App\Http\Controllers\DealsController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\RewardController;
 use App\Http\Controllers\GiftController;
+use App\Http\Controllers\SportCenterController;
+use App\Http\Controllers\CourtController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -76,9 +79,9 @@ Route::post('/admin/feedback/{id}/reply', [FeedbackController::class, 'reply'])-
 //reward
 //reward
 //reward
-Route::get('/admin/redemptions', [RewardController::class, 'viewRedemptions']);
+Route::get('/admin/redemptions', [RewardController::class, 'viewRedemptions'])->name('admin.redemptions.index');
 
-Route::post('/admin/redemptions/{id}/status', [RewardController::class, 'updateRedemptionStatus']);
+Route::post('/admin/redemptions/{id}/status', [RewardController::class, 'updateRedemptionStatus'])->name('admin.redemptions.updateStatus');
 
 //gift
 //gift
@@ -101,3 +104,35 @@ Route::get('/admin/gifts/edit/{id}', [GiftController::class, 'edit'])->name('adm
 Route::put('/admin/gifts/update/{id}', [GiftController::class, 'update'])->name('admin.gifts.update');
 
 Route::delete('/admin/gifts/delete/{id}', [GiftController::class, 'destroy'])->name('admin.gifts.destroy');
+
+//add sport center and court
+//add sport center and court
+//add sport center and court
+//add sport center and court
+//add sport center and court
+//add sport center and court
+//add sport center and court
+//add sport center and court
+//add sport center and court
+//add sport center and court
+
+// SportCenter Routes
+Route::prefix('sportcenters')->group(function () {
+    Route::get('/', [SportCenterController::class, 'index'])->name('sportcenters.index'); // List all sport centers
+    Route::get('/create', [SportCenterController::class, 'create'])->name('sportcenters.create'); // Show form to create a sport center
+    Route::post('/', [SportCenterController::class, 'store'])->name('sportcenters.store'); // Save a new sport center
+    Route::get('/{sportcenter}/edit', [SportCenterController::class, 'edit'])->name('sportcenters.edit'); // Show form to edit a sport center
+    Route::put('/{sportcenter}', [SportCenterController::class, 'update'])->name('sportcenters.update'); // Update a sport center
+    Route::delete('/{sportcenter}', [SportCenterController::class, 'destroy'])->name('sportcenters.destroy'); // Delete a sport center
+
+    // Nested Court Routes
+    Route::prefix('{sportcenter}/courts')->group(function () {
+        Route::get('/', [CourtController::class, 'index'])->name('sportcenters.courts.index'); // List all courts for a sport center
+        Route::get('/create', [CourtController::class, 'create'])->name('sportcenters.courts.create'); // Show form to create a court
+        Route::post('/', [CourtController::class, 'store'])->name('sportcenters.courts.store'); // Save a new court
+        Route::get('/{court}/edit', [CourtController::class, 'edit'])->name('sportcenters.courts.edit'); // Show form to edit a court
+        Route::put('/{court}', [CourtController::class, 'update'])->name('sportcenters.courts.update'); // Update a court
+        Route::delete('/{court}', [CourtController::class, 'destroy'])->name('sportcenters.courts.destroy'); // Delete a court
+    });
+});
+

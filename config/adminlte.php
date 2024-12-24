@@ -359,34 +359,26 @@ return [
                     'icon' => 'fas fa-fw fa-smile',
 
                 ],
+               
                 [
-                    'text' => 'level_one',
-                    'url' => '#',
-                    'submenu' => [
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                        ],
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                            'submenu' => [
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                            ],
-                        ],
-                    ],
+                    'text' => 'Gift Redemption',
+                    'url' => 'admin/redemptions',
+                    'icon' => 'fas fa-fw fa-gift',
                 ],
+            ],
+        ],
+        [
+            'text' => 'SportCenter & Court',
+            'icon' => 'fas fa-fw fa-wifi',
+            'submenu' => [
                 [
-                    'text' => 'level_one',
-                    'url' => '#',
+                    'text' => 'SportCenter Management',
+                    'url' => 'sportcenters',
+                    'icon' => 'fas fa-fw fa-smile',
+
                 ],
+               
+            
             ],
         ],
         ['header' => 'labels'],
