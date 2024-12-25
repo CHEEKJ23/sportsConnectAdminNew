@@ -12,7 +12,7 @@ class Court extends Model
         'sport_center_id',
         'number',
         'type',
-        'availability',
+        // 'availability',
     ];
 
     /**

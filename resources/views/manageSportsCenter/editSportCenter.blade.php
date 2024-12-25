@@ -12,7 +12,7 @@
     <form action="{{ route('sportcenters.update', $sportCenter->id) }}" method="POST" enctype="multipart/form-data">
 
         @csrf
-        @method('PUT')
+        @method('POST')
 
         <div class="form-group">
             <label for="name">Name</label>

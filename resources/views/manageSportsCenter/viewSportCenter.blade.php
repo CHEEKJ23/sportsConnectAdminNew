@@ -17,6 +17,14 @@
             <h5 class="card-title">{{ $sportCenter->name }}</h5>
             <p class="card-text">{{ $sportCenter->description }}</p>
             <p class="card-text">Location: {{ $sportCenter->location }}</p>
+            
+            <!-- Display the sport center image -->
+            @if($sportCenter->image)
+                <img src="{{ asset('images/' . $sportCenter->image) }}" alt="{{ $sportCenter->name }}" class="img-fluid mb-3" style="max-width: 200px;">
+            @else
+                <p>No image available</p>
+            @endif
+<br>
             <a href="{{ route('sportcenters.courts.index', $sportCenter->id) }}" class="btn btn-secondary">View Courts</a>
             <a href="{{ route('sportcenters.edit', $sportCenter->id) }}" class="btn btn-warning">Edit</a>
             

@@ -34,8 +34,8 @@ class SportCenterController extends Controller
 
         $imagePath = null;
 
-        if ($request->hasFile('image_path')) {
-            $file = $request->file('image_path');
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
             if ($file->isValid()) {
                 $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images'), $fileName);
@@ -62,25 +62,49 @@ class SportCenterController extends Controller
     }
 
     // Update a sport center
-    public function update(Request $request, SportCenter $sportCenter)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'location' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'price' => 'required|numeric',
-        ]);
+    public function update(Request $request, $id)
+{
+    // Validate the request data
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'location' => 'required|string',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'price' => 'required|numeric',
+    ]);
 
-        if ($request->file('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');               //problem here
-            $sportCenter->update(['image' => $imagePath]);
+    // Find the sport center by ID, or fail if not found
+    $sportCenter = SportCenter::findOrFail($id);
+
+    // Handle image upload if provided
+    if ($request->hasFile('image')) {
+        $file = $request->file('image');
+        if ($file->isValid()) {
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images'), $fileName);
+            $imagePath = $fileName;
+
+            // Delete the old image if it exists
+            if ($sportCenter->image && file_exists(public_path('images/' . $sportCenter->image))) {
+                unlink(public_path('images/' . $sportCenter->image));
+            }
+
+            $sportCenter->image = $imagePath; // Update the image path
         }
-
-        $sportCenter->update($request->only(['name', 'description', 'location', 'price']));
-
-        return redirect()->route('sportcenters.index')->with('success', 'Sport Center updated successfully.');
     }
+
+    // Update the sport center details
+    $sportCenter->update([
+        'name' => $request->name,
+        'description' => $request->description,
+        'location' => $request->location,
+        'price' => $request->price,
+        'image' => $sportCenter->image, // Use the updated image path
+    ]);
+
+    // Redirect to the sport center list with a success message
+    return redirect()->route('sportcenters.index')->with('success', 'Sport Center updated successfully.');
+}
 
     // Delete a sport center
     public function destroy($id)

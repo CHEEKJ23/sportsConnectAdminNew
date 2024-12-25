@@ -62,7 +62,7 @@ public function edit($sportCenterId, $courtId)
 }
 
 // Update a court
-public function update(Request $request, $courtId)
+public function update(Request $request, $sportCenterId, $courtId)
 {
     // Retrieve the Court instance using the provided ID
     $court = Court::findOrFail($courtId);
@@ -71,14 +71,14 @@ public function update(Request $request, $courtId)
     $request->validate([
         'number' => 'required|integer',
         'type' => 'required|string|max:255',
-        'availability' => 'required|boolean',
+        // 'availability' => 'required|boolean',
     ]);
 
     // Update the court with the validated data
     $court->update($request->all());
 
     // Redirect to the courts index route with a success message
-    return redirect()->route('sportcenters.courts.index', $court->sport_center_id)->with('success', 'Court updated successfully.');
+    return redirect()->route('sportcenters.courts.index', $sportCenterId)->with('success', 'Court updated successfully.');
 }
 
 // Delete a court

@@ -122,7 +122,7 @@ Route::prefix('sportcenters')->group(function () {
     Route::get('/create', [SportCenterController::class, 'create'])->name('sportcenters.create'); // Show form to create a sport center
     Route::post('/', [SportCenterController::class, 'store'])->name('sportcenters.store'); // Save a new sport center
     Route::get('/{sportcenter}/edit', [SportCenterController::class, 'edit'])->name('sportcenters.edit'); // Show form to edit a sport center
-    Route::put('/{sportcenter}', [SportCenterController::class, 'update'])->name('sportcenters.update'); // Update a sport center
+    Route::post('/{sportcenter}', [SportCenterController::class, 'update'])->name('sportcenters.update'); // Update a sport center
     Route::delete('/{sportcenter}', [SportCenterController::class, 'destroy'])->name('sportcenters.destroy'); // Delete a sport center
 
     // Nested Court Routes
@@ -135,4 +135,24 @@ Route::prefix('sportcenters')->group(function () {
         Route::delete('/{court}', [CourtController::class, 'destroy'])->name('sportcenters.courts.destroy'); // Delete a court
     });
 });
+// List all equipment
+Route::get('equipment', [EquipmentRentalController::class, 'index'])->name('equipment.index');
+
+// Show form to create new equipment
+Route::get('equipment/create', [EquipmentRentalController::class, 'create'])->name('equipment.create');
+
+// Store a newly created equipment
+Route::post('equipment', [EquipmentRentalController::class, 'store'])->name('equipment.store');
+
+// Show a specific equipment (optional, if needed)
+Route::get('equipment/{equipment}', [EquipmentRentalController::class, 'show'])->name('equipment.show');
+
+// Show form to edit existing equipment
+Route::get('equipment/{equipment}/edit', [EquipmentRentalController::class, 'edit'])->name('equipment.edit');
+
+// Update existing equipment
+Route::put('equipment/{equipment}', [EquipmentRentalController::class, 'update'])->name('equipment.update');
+
+// Delete existing equipment
+Route::delete('equipment/{equipment}', [EquipmentRentalController::class, 'destroy'])->name('equipment.destroy');
 

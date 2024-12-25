@@ -311,22 +311,7 @@ return [
         ],
 
         // Sidebar items:
-        [
-            'type' => 'sidebar-menu-search',
-            'text' => 'search',
-        ],
-        [
-            'text' => 'blog',
-            'url' => 'admin/blog',
-            'can' => 'manage-blog',
-        ],
-        [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
-        ],
+       
         ['header' => 'Actions'],
         [
             'text' => 'User List',
@@ -339,11 +324,7 @@ return [
             'icon' => 'fas fa-fw fa-comment',
         ],
      
-        [
-            'text' => 'Manage Rental',
-            'url' => 'admin/rental-returns',
-            'icon' => 'fas fa-fw fa-calendar',
-        ],
+        
         [
             'text' => 'Manage Feedback',
             'url' => 'admin/feedback',
@@ -369,34 +350,36 @@ return [
         ],
         [
             'text' => 'SportCenter & Court',
-            'icon' => 'fas fa-fw fa-wifi',
+            'icon' => 'fas fa-fw fa-bookmark',
             'submenu' => [
                 [
                     'text' => 'SportCenter Management',
                     'url' => 'sportcenters',
-                    'icon' => 'fas fa-fw fa-smile',
+                    'icon' => 'fas fa-fw fa-check',
 
                 ],
                
             
             ],
         ],
-        ['header' => 'labels'],
         [
-            'text' => 'important',
-            'icon_color' => 'red',
-            'url' => '#',
+            'text' => 'Rental',
+            'icon' => 'fas fa-fw fa-bookmark',
+            'submenu' => [
+                [
+                    'text' => 'Manage Rental',
+                    'url' => 'admin/rental-returns',
+                    'icon' => 'fas fa-fw fa-calendar',
+                ],
+                [
+                    'text' => 'Manage Equipment',
+                    'url' => 'equipment',
+                    'icon' => 'fas fa-fw fa-calendar',
+                ],
+            
+            ],
         ],
-        [
-            'text' => 'warning',
-            'icon_color' => 'yellow',
-            'url' => '#',
-        ],
-        [
-            'text' => 'information',
-            'icon_color' => 'cyan',
-            'url' => '#',
-        ],
+     
     ],
 
     /*

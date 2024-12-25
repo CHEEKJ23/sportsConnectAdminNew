@@ -239,13 +239,155 @@ public function completeReturn(Request $request)
     return redirect()->route('rentalReturns')->with('message', 'Return process completed successfully.');
 }
 //（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
+//（admin）
 public function showReturnRequests()
 {
     $rentals = EquipmentRental::where('rentalStatus', 'Pending Return')
         ->with(['equipment', 'user'])
         ->get();
 
-    return view('manageRental', compact('rentals'));
+    return view('manageEquipment.manageRental', compact('rentals'));
 }
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+//（admin）manage equipment
+
+// Display a listing of the equipment
+public function index()
+{
+    $equipment = Equipment::all();
+    return view('manageEquipment.viewEquipment', compact('equipment'));
+}
+
+// Show the form for creating new equipment
+public function create()
+{
+    $sportCenters = SportCenter::all(); // Fetch all sport centers
+    return view('manageEquipment.createEquipment', compact('sportCenters'));
+}
+
+// Store a newly created equipment in storage
+public function store(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'price_per_hour' => 'required|numeric',
+        'quantity_available' => 'required|integer',
+        'condition' => 'required|string|max:255',
+        'deposit_amount' => 'required|numeric',
+        'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'sport_center_id' => 'required|integer|exists:sport_centers,id',
+    ]);
+
+    $data = $request->all();
+
+    if ($request->hasFile('image_path')) {
+        $file = $request->file('image_path');
+        $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('images'), $fileName);
+        $data['image_path'] = $fileName;
+    }
+
+    Equipment::create($data);
+
+    return redirect()->route('equipment.index')->with('success', 'Equipment created successfully.');
+}
+
+// Show the form for editing the specified equipment
+public function edit($id)
+{
+    $sportCenters = SportCenter::all(); // Fetch all sport centers
+    $equipment = Equipment::findOrFail($id);
+    return view('manageEquipment.editEquipment', compact('equipment', 'sportCenters'));
+}
+
+// Update the specified equipment in storage
+public function update(Request $request, $id)
+{
+    $equipment = Equipment::findOrFail($id);
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'price_per_hour' => 'required|numeric',
+        'quantity_available' => 'required|integer',
+        'condition' => 'required|string|max:255',
+        'deposit_amount' => 'required|numeric',
+        'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'sport_center_id' => 'required|integer|exists:sport_centers,id',
+    ]);
+
+    $data = $request->all();
+
+    if ($request->hasFile('image_path')) {
+        $file = $request->file('image_path');
+        $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('images'), $fileName);
+        $data['image_path'] = $fileName;
+
+        // Delete the old image if it exists
+        if ($equipment->image_path && file_exists(public_path('images/' . $equipment->image_path))) {
+            unlink(public_path('images/' . $equipment->image_path));
+        }
+    }
+
+    $equipment->update($data);
+
+    return redirect()->route('equipment.index')->with('success', 'Equipment updated successfully.');
+}
+
+// Remove the specified equipment from storage
+public function destroy($id)
+{
+    $equipment = Equipment::findOrFail($id);
+
+    // Delete the image if it exists
+    if ($equipment->image_path && file_exists(public_path('images/' . $equipment->image_path))) {
+        unlink(public_path('images/' . $equipment->image_path));
+    }
+
+    $equipment->delete();
+
+    return redirect()->route('equipment.index')->with('success', 'Equipment deleted successfully.');
+}
+
+
+
+
 
 }
