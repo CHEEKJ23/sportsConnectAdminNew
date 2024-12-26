@@ -97,8 +97,12 @@ Route::prefix('auth')
         Route::get('/view/points', [RewardController::class, 'getUserPoints']);
         Route::get('/view/gifts', [RewardController::class, 'getGifts']);
         Route::post('/redeem/gift', [RewardController::class, 'redeemGift']);
+
+        //show user points
+        Route::get('user/{userId}/points', [ActivityController::class, 'showUserPoints'])->name('api.user.points.show');
     });
     
+
 
 
 

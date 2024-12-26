@@ -25,7 +25,7 @@ class ActivityController extends Controller
         ]);
 
         $activity = Activity::create($validated);
-        $this->awardPoints($validatedData['user_id'], 10); 
+        $this->awardPoints($validated['user_id'], 10); 
 
         return response()->json(['message' => 'Activity created successfully', 'activity' => $activity], 201);
     }
@@ -43,7 +43,29 @@ private function awardPoints($userId, $points)
 // Helper function to award points
 // Helper function to award points
 
-    
+
+
+//show user points
+//show user points
+//show user points
+//show user points
+//show user points
+public function showUserPoints($userId)
+    {
+        $userPoints = UserPoints::where('user_id', $userId)->first();
+        $totalPoints = $userPoints ? $userPoints->points : 0;
+
+        return response()->json(['user_id' => $userId, 'total_points' => $totalPoints]);
+    }
+//show user points
+//show user points
+//show user points
+//show user points
+//show user points
+
+
+
+
 //join activity
 //join activity
 //join activity

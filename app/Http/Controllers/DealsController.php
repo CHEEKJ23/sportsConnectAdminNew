@@ -102,20 +102,21 @@ private function awardPoints($userId, $points)
 
     // View deals listed by other users
     public function viewAllDeals(Request $request)
-    {
-        $userID = $request->user()->id; 
-    
-        // Fetch deals where the userID is not equal to the current user's ID
-        $deals = Deal::where('userID', '!=', $userID)
-                    ->with('user:id,name')
-                    ->get()
-                    ->map(function ($deal) {
-                        $deal->image_url = $deal->image_path ? asset($deal->image_path) : null; // Generate the full URL
-                        return $deal;
-                    });
-    
-        return response()->json($deals);
-    }
+{
+    $userID = $request->user()->id; 
+
+    // Fetch deals where the userID is not equal to the current user's ID and status is 'Approved'
+    $deals = Deal::where('userID', '!=', $userID)
+                ->where('status', 'Approved') // Add condition for status
+                ->with('user:id,name')
+                ->get()
+                ->map(function ($deal) {
+                    $deal->image_url = $deal->image_path ? asset($deal->image_path) : null; // Generate the full URL
+                    return $deal;
+                });
+
+    return response()->json($deals);
+}
  
     // View deals listed by the authenticated user
     public function viewMyDeals(Request $request)
