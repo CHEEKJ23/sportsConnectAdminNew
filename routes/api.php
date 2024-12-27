@@ -59,6 +59,7 @@ Route::prefix('auth')
         Route::post('/book-court', [BookingController::class, 'bookCourt']);
         Route::get('/myBookings', [BookingController::class, 'getMyBookings']);
         Route::put('/modifyBookings/{bookingId}', [BookingController::class, 'updateBooking']);
+        Route::post('/bookings/{bookingId}/cancel', [BookingController::class, 'cancelBooking']);
         //equipment rental
         Route::post('/equipment-rental/check-availability', [EquipmentRentalController::class, 'checkAvailability']);
         Route::get('/equipment-rental/get-sports-centers', [EquipmentRentalController::class, 'getSportsCentersByLocation']);

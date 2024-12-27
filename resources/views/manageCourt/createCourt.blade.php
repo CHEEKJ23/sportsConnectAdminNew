@@ -22,13 +22,13 @@
             <input type="text" name="type" class="form-control" id="type" value="{{ old('type') }}" required>
         </div>
 
-        <div class="form-group">
+        {{-- <div class="form-group">
             <label for="availability">Availability</label>
             <select name="availability" id="availability" class="form-control">
                 <option value="1">Available</option>
                 <option value="0">Not Available</option>
             </select>
-        </div>
+        </div> --}}
 
         <button type="submit" class="btn btn-primary">Create</button>
         <a href="{{ route('sportcenters.courts.index', $sportCenter->id) }}" class="btn btn-secondary">Cancel</a>

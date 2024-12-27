@@ -12,37 +12,57 @@ use App\Models\User;
 use App\Models\Booking; 
 use Illuminate\Http\JsonResponse;
 use App\Models\UserPoints;
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+
 class BookingController extends Controller
 {
      // Step 1: Search for available sports centers
      public function searchSportCenters(Request $request)
-     {
-        
-         $validated = $request->validate([
-             'sportType' => 'required|string',
-             'location' => 'required|string',
-             'date' => 'required|date',
-            //  'startTime' => 'required|date_format:H:i',
-            //  'endTime' => 'required|date_format:H:i|after:startTime',
-            'startTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
-'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/|after:startTime',
-         ]);
- 
-         // Find sports centers with courts matching the given type and location
-         $sportCenters = SportCenter::where('location', $validated['location'])
-            ->whereHas('courts', function ($query) use ($validated) {
-                $query->where('type', $validated['sportType'])
-                      ->whereDoesntHave('bookings', function ($query) use ($validated) {
-                          $query->where('date', $validated['date'])
-                                ->where(function ($q) use ($validated) {
-                                    $q->whereBetween('startTime', [$validated['startTime'], $validated['endTime']])
-                                      ->orWhereBetween('endTime', [$validated['startTime'], $validated['endTime']]);
-                                });
-                      });
-            })->get();
- 
-         return response()->json($sportCenters);
-     }
+{
+    $validated = $request->validate([
+        'sportType' => 'required|string',
+        'location' => 'required|string',
+        'date' => 'required|date',
+        'startTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
+        'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
+    ]);
+
+    // Ensure startTime and endTime are in the correct format
+    $startTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validated['startTime']));
+    $endTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validated['endTime']));
+
+    // Adjust endTime if it is earlier than startTime, assuming it belongs to the next day
+    if ($endTime->lessThanOrEqualTo($startTime)) {
+        $endTime->addDay();
+    }
+
+    // Your existing logic to find sport centers
+    $sportCenters = SportCenter::where('location', $validated['location'])
+        ->whereHas('courts', function ($query) use ($validated, $startTime, $endTime) {
+            $query->where('type', $validated['sportType'])
+                  ->whereDoesntHave('bookings', function ($query) use ($validated, $startTime, $endTime) {
+                      $query->where('date', $validated['date'])
+                            ->where(function ($q) use ($startTime, $endTime) {
+                                $q->whereBetween('startTime', [$startTime->format('H:i'), $endTime->format('H:i')])
+                                  ->orWhereBetween('endTime', [$startTime->format('H:i'), $endTime->format('H:i')]);
+                            });
+                  });
+        })->get();
+
+    return response()->json($sportCenters);
+}
+
+// Helper function to format time
+private function formatTime($time)
+{
+    $parts = explode(':', $time);
+    $hour = str_pad($parts[0], 2, '0', STR_PAD_LEFT);
+    $minute = str_pad($parts[1], 2, '0', STR_PAD_LEFT);
+    return "$hour:$minute";
+}
  
      // Step 2: Get available courts for a selected sports center
      public function getAvailableCourts(Request $request, $sportCenterId)
@@ -52,9 +72,15 @@ class BookingController extends Controller
         'sportType' => 'required|string',
         'date' => 'required|date',
         'startTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
-        'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/|after:startTime',
+        'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
     ]);
+    $startTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validated['startTime']));
+    $endTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validated['endTime']));
 
+    // Adjust endTime if it is earlier than startTime, assuming it belongs to the next day
+    if ($endTime->lessThanOrEqualTo($startTime)) {
+        $endTime->addDay();
+    }
     $availableCourts = Court::where('sport_center_id', $sportCenterId)
     // ->where('sport_center_id', $validated['sport_center_id'])
 
@@ -80,9 +106,15 @@ class BookingController extends Controller
         // 'location' => 'required|string',
         'date' => 'required|date',
         'startTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
-        'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/|after:startTime',
+        'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
     ]);
+    $startTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validatedData['startTime']));
+    $endTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validatedData['endTime']));
 
+    // Adjust endTime if it is earlier than startTime, assuming it belongs to the next day
+    if ($endTime->lessThanOrEqualTo($startTime)) {
+        $endTime->addDay();
+    }
     // Check if the court is already booked for the selected date and time range
     $isBooked = Booking::where('court_id', $validatedData['court_id'])
         ->where('date', $validatedData['date'])
@@ -129,13 +161,14 @@ public function getMyBookings(Request $request) {
     $bookings = Booking::where('user_id', $userId)
         ->with([
             'sportCenter:id,name',
-            'court:id,type'   
+            'court:id,type,number'   
         ])
         ->get(['id', 'user_id', 'sport_center_id', 'court_id', 'date', 'startTime', 'endTime']); 
 
     $bookings->each(function ($booking) {
         $booking->sport_center_name = $booking->sportCenter->name;
         $booking->sport_type_name = $booking->court->type;
+        $booking->court_number = $booking->court->number;
         unset($booking->sportCenter, $booking->court); 
     });
 
@@ -151,9 +184,15 @@ public function updateBooking(Request $request, $bookingId)
     $validatedData = $request->validate([
         'date' => 'required|date',
         'startTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
-        'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/|after:startTime',
+        'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
     ]);
+    $startTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validatedData['startTime']));
+    $endTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validatedData['endTime']));
 
+    // Adjust endTime if it is earlier than startTime, assuming it belongs to the next day
+    if ($endTime->lessThanOrEqualTo($startTime)) {
+        $endTime->addDay();
+    }
     $booking = Booking::where('id', $bookingId)
         ->where('user_id', $request->user()->id)
         ->firstOrFail();
@@ -171,4 +210,48 @@ public function updateBooking(Request $request, $bookingId)
     return response()->json(['message' => 'Booking updated successfully', 'booking' => $booking]);
 }
 
+    // Step 4: Cancel a booking
+    public function cancelBooking(Request $request, $bookingId)
+{
+    $userId = $request->user()->id;
+
+    // Find the booking
+    $booking = Booking::where('id', $bookingId)
+        ->where('user_id', $userId)
+        ->firstOrFail();
+
+    // Calculate the time difference
+    $startTime = Carbon::createFromFormat('Y-m-d H:i:s', $booking->date . ' ' . $booking->startTime);
+    $now = Carbon::now();
+    $hoursUntilStart = $now->diffInHours($startTime, false);
+
+    // Debugging: Output the calculated hours until start
+    \Log::info("Hours until start: $hoursUntilStart");
+
+    // Disallow cancellation if the booking is for the next day
+    if ($hoursUntilStart < 24) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Cancellations are not allowed within 24 hours of the booking start time.',
+        ], 403);
+    }
+
+    // Determine refund percentage
+    $refundPercentage = 0;
+    if ($hoursUntilStart >= 48) {
+        $refundPercentage = 100;
+    } elseif ($hoursUntilStart >= 24) {
+        $refundPercentage = 50;
+    }
+
+    // Delete the booking
+    $booking->delete();
+
+    // Return response with refund information
+    return response()->json([
+        'status' => 'success',
+        'message' => "Booking deleted successfully. You will receive a $refundPercentage% refund.",
+    ]);
 }
+}
+
