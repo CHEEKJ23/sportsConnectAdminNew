@@ -319,6 +319,11 @@ return [
             'icon' => 'fas fa-fw fa-user',
         ],
         [
+            'text' => 'Manage Court Booking',
+            'url' => 'manageCourtBooking',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
             'text' => 'Manage Deals',
             'url' => 'admin/manage-deals',
             'icon' => 'fas fa-fw fa-comment',
@@ -367,7 +372,12 @@ return [
             'icon' => 'fas fa-fw fa-bookmark',
             'submenu' => [
                 [
-                    'text' => 'Manage Rental',
+                    'text' => 'Manage User Rentals',
+                    'url' => 'rentals',
+                    'icon' => 'fas fa-fw fa-calendar',
+                ],
+                [
+                    'text' => 'Manage Rental Returns',
                     'url' => 'admin/rental-returns',
                     'icon' => 'fas fa-fw fa-calendar',
                 ],
@@ -376,6 +386,7 @@ return [
                     'url' => 'equipment',
                     'icon' => 'fas fa-fw fa-calendar',
                 ],
+                
             
             ],
         ],

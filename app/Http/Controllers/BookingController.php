@@ -253,5 +253,100 @@ public function updateBooking(Request $request, $bookingId)
         'message' => "Booking deleted successfully. You will receive a $refundPercentage% refund.",
     ]);
 }
+
+//admin
+//admin
+//admin
+//admin
+//admin
+//admin
+//admin
+//admin
+//admin
+public function showBookingCalendar()
+{
+    // Fetch all bookings with related sport center and court information
+    $bookings = Booking::with(['sportCenter:id,name', 'court:id,type,number'])
+        ->get(['id', 'sport_center_id', 'court_id', 'date', 'startTime', 'endTime']);
+
+    // Format bookings for FullCalendar
+    $events = $bookings->map(function ($booking) {
+        return [
+            'title' => $booking->sportCenter->name . ' - ' . $booking->court->type . ' Court ' . $booking->court->number,
+            'start' => $booking->date . 'T' . $booking->startTime,
+            'end' => $booking->date . 'T' . $booking->endTime,
+        ];
+    });
+
+    // Fetch all sport centers
+    $sportCenters = SportCenter::all();
+
+    // Pass both events and sport centers to the view
+    return view('manageCourtBooking', compact('events', 'sportCenters'));
+}
+
+public function adminCreateBooking(Request $request)
+{
+    $validatedData = $request->validate([
+        'user_id' =>  'nullable|exists:users,id',
+        'sport_center_id' => 'required|exists:sport_centers,id',
+        'court_id' => 'required|exists:courts,id',
+        'date' => 'required|date',
+        'startTime' => 'required|regex:/^\d{1,2}:\d{1,2}$
+        /',
+        'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
+    ]);
+
+    $startTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validatedData['startTime']));
+    $endTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validatedData['endTime']));
+
+    if ($endTime->lessThanOrEqualTo($startTime)) {
+        $endTime->addDay();
+    }
+
+    // Check if the court is already booked for the selected date and time range
+    $isBooked = Booking::where('court_id', $validatedData['court_id'])
+        ->where('date', $validatedData['date'])
+        ->where('status', 'confirmed')
+        ->where(function ($query) use ($validatedData) {
+            $query->whereBetween('startTime', [$validatedData['startTime'], $validatedData['endTime']])
+                ->orWhereBetween('endTime', [$validatedData['startTime'], $validatedData['endTime']])
+                ->orWhere(function ($q) use ($validatedData) {
+                    $q->where('startTime', '<=', $validatedData['startTime'])
+                      ->where('endTime', '>=', $validatedData['endTime']);
+                });
+        })
+        ->exists();
+
+    if ($isBooked) {
+        return response()->json(['message' => 'Court is already booked for the selected time'], 409);
+    }
+
+    // Create the booking
+    $validatedData['status'] = 'confirmed';
+    $booking = Booking::create($validatedData);
+
+    return response()->json(['message' => 'Court booked successfully', 'booking' => $booking], 201);
+}
+
+public function getCourtTypes($sportCenterId)
+{
+    $courtTypes = Court::where('sport_center_id', $sportCenterId)
+        ->distinct()
+        ->pluck('type');
+
+    return response()->json($courtTypes);
+}
+
+public function getCourts($sportCenterId, $courtType)
+{
+    $courts = Court::where('sport_center_id', $sportCenterId)
+        ->where('type', $courtType)
+        ->get(['id', 'number']);
+
+    return response()->json($courts);
+}
+
+
 }
 

@@ -19,8 +19,10 @@ return new class extends Migration
             $table->time('startTime');
             $table->time('endTime');
             $table->integer('quantity_rented');
-            $table->boolean('deposit_returned')->default(false);
+            $table->integer('deposit_returned')->nullable();
+            $table->integer('deposit_paid')->nullable();
             $table->string('rentalStatus')->default('Pending'); // e.g., Pending, Approved, Completed
+            $table->integer('lateFee')->nullable();
             $table->timestamps();
     
             $table->unsignedBigInteger('userID');

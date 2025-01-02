@@ -53,7 +53,19 @@ Route::post('/admin/user-list/search',[App\Http\Controllers\UserController::clas
 
 Route::get('/admin/user-list/remove/User/{id}', [App\Http\Controllers\UserController::class, 'deleteUser'])->name('deleteUser');
 
+
+
+
+
 Route::post('/admin/rentals/complete-return', [EquipmentRentalController::class, 'completeReturn'])->name('completeReturn');
+
+//manage deposit paid by user when renting at counter
+Route::post('/admin/rentals/receive-return-request', [EquipmentRentalController::class, 'updateDepositReturned'])->name('updateDepositReturned');
+
+//manage return (deposit and returned quantity)
+Route::post('/rentals/{rentalID}/process-return', [EquipmentRentalController::class, 'processReturn'])->name('rentals.processReturn');
+
+
 
 Route::get('/admin/rental-returns', [EquipmentRentalController::class, 'showReturnRequests'])->name('rentalReturns');
 
@@ -156,3 +168,26 @@ Route::put('equipment/{equipment}', [EquipmentRentalController::class, 'update']
 // Delete existing equipment
 Route::delete('equipment/{equipment}', [EquipmentRentalController::class, 'destroy'])->name('equipment.destroy');
 
+
+//manage rentals (deposit) and update returned deposit
+Route::get('rentals', [EquipmentRentalController::class, 'indexForRentals'])->name('admin.rentals.index');
+
+Route::post('rentals/{rentalID}/update-deposit', [EquipmentRentalController::class, 'updateDeposit'])->name('admin.rentals.updateDeposit');
+
+//calendar
+//calendar
+//calendar
+//calendar
+//calendar
+//calendar
+//calendar
+//calendar
+//calendar
+//calendar
+//manage court booking
+Route::get('manageCourtBooking', [BookingController::class, 'showBookingCalendar'])->name('manageCourtBooking');
+
+Route::post('/admin/bookings/create', [BookingController::class, 'adminCreateBooking'])->name('admin.bookings.create');
+
+Route::get('/admin/sport-centers/{sportCenterId}/court-types', [BookingController::class, 'getCourtTypes']);
+Route::get('/admin/sport-centers/{sportCenterId}/courts/{courtType}', [BookingController::class, 'getCourts']);

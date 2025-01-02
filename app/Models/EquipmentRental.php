@@ -19,7 +19,9 @@ class EquipmentRental extends Model
         'endTime', 
         'quantity_rented', 
         'deposit_returned', 
+        'deposit_paid', 
         'rentalStatus',
+        'lateFee',
     ];
 
     public function equipment()

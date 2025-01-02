@@ -174,7 +174,7 @@ private function awardPoints($userId, $points)
             'sportCenter:id,name',
             'equipment:equipmentID,name'
         ])
-        ->get(['rentalID', 'userID', 'sport_center_id', 'equipmentID', 'date', 'startTime', 'endTime', 'quantity_rented', 'rentalStatus']);
+        ->get(['rentalID', 'userID', 'sport_center_id', 'equipmentID', 'date', 'startTime', 'endTime', 'quantity_rented', 'rentalStatus', 'lateFee']);
 
     $rentals->each(function ($rental) {
         $rental->sport_center_name = $rental->sportCenter->name;
@@ -200,7 +200,7 @@ public function receiveReturnRequest(Request $request)
 
     $rental = EquipmentRental::findOrFail($validatedData['rentalID']);
 
-    if ($rental->rentalStatus !== 'Ongoing') {
+    if ($rental->rentalStatus !== 'Successful') {
         return response()->json(['message' => 'Invalid return request'], 400);
     }
 
@@ -212,31 +212,96 @@ public function receiveReturnRequest(Request $request)
 /**
  * Step 5: Complete return （admin）
  */
-public function completeReturn(Request $request)
+// public function completeReturn(Request $request)
+// {
+//     $validatedData = $request->validate([
+//         'rentalID' => 'required|exists:equipment_rentals,rentalID',
+//         'equipmentQuality' => 'required|string', // Assuming quality check is a string input
+//     ]);
+
+//     $rental = EquipmentRental::findOrFail($validatedData['rentalID']);
+
+//     if ($rental->rentalStatus !== 'Pending Return') {
+//         return response()->json(['message' => 'Invalid return process'], 400);
+//     }
+
+//     // Update equipment availability
+//     $equipment = Equipment::findOrFail($rental->equipmentID);
+//     $equipment->increment('quantity_available', $rental->quantity_rented);
+
+//     // Update rental details
+//     $rental->update([
+//         'rentalStatus' => 'Completed',
+//         'actualReturnDateTime' => now(),
+//         'equipmentQuality' => $validatedData['equipmentQuality'],
+//     ]);
+
+//     return redirect()->route('rentalReturns')->with('message', 'Return process completed successfully.');
+// }
+
+// public function updateDepositReturned(Request $request, $rentalID)
+// {
+//     // Validate the input
+//     $validatedData = $request->validate([
+//         'deposit_returned' => 'required|integer',
+//     ]);
+
+//     // Find the rental
+//     $rental = EquipmentRental::findOrFail($rentalID);
+
+//     // Update the deposit returned
+//     $rental->deposit_returned = $validatedData['deposit_returned'];
+
+//     // Save the changes
+//     $rental->save();
+
+//     return redirect()->route('admin.rentals.index')->with('success', 'Deposit returned amount updated successfully.');
+// }
+public function processReturn(Request $request, $rentalID)
 {
+    // Validate the input
     $validatedData = $request->validate([
-        'rentalID' => 'required|exists:equipment_rentals,rentalID',
-        'equipmentQuality' => 'required|string', // Assuming quality check is a string input
+
+        'quantity_returned' => 'required|integer|min:1',
+        'deposit_returned' => 'required|numeric',
     ]);
 
-    $rental = EquipmentRental::findOrFail($validatedData['rentalID']);
+    // Find the rental
+    $rental = EquipmentRental::findOrFail($rentalID);
 
     if ($rental->rentalStatus !== 'Pending Return') {
-        return response()->json(['message' => 'Invalid return process'], 400);
+        return redirect()->route('admin.rentals.index')->with('error', 'Invalid return process.');
     }
+
+    // Check if the returned quantity matches the rented quantity
+    if ($validatedData['quantity_returned'] != $rental->quantity_rented) {
+        return redirect()->back()->with('error', 'The returned quantity does not match the rented quantity.');
+    }
+
+    // Check if the deposit returned is valid
+    if ($validatedData['deposit_returned'] > $rental->deposit_paid || $validatedData['deposit_returned'] < $rental->deposit_paid) {
+        return redirect()->back()->with('error', 'The deposit returned does not match the deposit paid.');
+    }
+
+    // Calculate late fee
+    $actualReturnTime = now();
+    $lateHours = $actualReturnTime->diffInHours($rental->endTime, false);
+    $lateFee = $lateHours > 0 ? $lateHours * 10 : 0; 
 
     // Update equipment availability
     $equipment = Equipment::findOrFail($rental->equipmentID);
-    $equipment->increment('quantity_available', $rental->quantity_rented);
+    $equipment->increment('quantity_available', $validatedData['quantity_returned']);
 
     // Update rental details
     $rental->update([
         'rentalStatus' => 'Completed',
         'actualReturnDateTime' => now(),
-        'equipmentQuality' => $validatedData['equipmentQuality'],
+        'deposit_returned' => $validatedData['deposit_returned'],
+        'lateFee' => $lateFee,
+
     ]);
 
-    return redirect()->route('rentalReturns')->with('message', 'Return process completed successfully.');
+    return redirect()->route('rentalReturns')->with('success', 'Return process completed successfully.');
 }
 //（admin）
 //（admin）
@@ -387,6 +452,41 @@ public function destroy($id)
 }
 
 
+
+public function indexForRentals()
+    {
+        // Retrieve all rentals with related equipment and sport center information
+        $rentals = EquipmentRental::with('equipment', 'sportCenter', 'user')->get();
+        return view('manageEquipment.manageRental2', compact('rentals'));
+    }
+
+    public function updateDeposit(Request $request, $rentalID)
+{
+    // Validate the input
+    $validatedData = $request->validate([
+        'deposit_paid' => 'required|numeric',
+    ]);
+
+    // Find the rental
+    $rental = EquipmentRental::findOrFail($rentalID);
+    $equipment = $rental->equipment;
+
+    // Store the paid deposit
+    $rental->deposit_paid = $validatedData['deposit_paid'];
+
+    // Check if deposit matches the required amount
+    if ($rental->deposit_paid == $equipment->deposit_amount) {
+        $rental->rentalStatus = 'Successful';
+    } else {
+        $rental->rentalStatus = 'Unsuccessful';
+        return redirect()->route('admin.rentals.index')->with('warning', 'Rental status updated unsuccessfully. Deposit does not match the required amount.');
+    }
+
+    // Save the rental status and deposit paid
+    $rental->save();
+
+    return redirect()->route('admin.rentals.index')->with('success', 'Rental status updated successfully. Deposit paid: $' . $rental->deposit_paid);
+}
 
 
 
