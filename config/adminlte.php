@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
+    'logo' => '<b>Sports</b>Connect',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
@@ -300,11 +300,7 @@ return [
 
     'menu' => [
         // Navbar items:
-        [
-            'type' => 'navbar-search',
-            'text' => 'search',
-            'topnav_right' => true,
-        ],
+    
         [
             'type' => 'fullscreen-widget',
             'topnav_right' => true,
@@ -319,9 +315,14 @@ return [
             'icon' => 'fas fa-fw fa-user',
         ],
         [
-            'text' => 'Manage Court Booking',
+            'text' => 'Booking Calendar',
             'url' => 'manageCourtBooking',
-            'icon' => 'fas fa-fw fa-user',
+            'icon' => 'fas fa-fw fa-calendar',
+        ],
+        [
+            'text' => 'Court Overview',
+            'url' => 'admin/overview',
+           'icon' => 'fas fa-fw fa-cog',
         ],
         [
             'text' => 'Manage Deals',

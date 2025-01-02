@@ -29,7 +29,7 @@
 
         <div class="form-group">
             <label for="price">Price</label>
-            <input type="number" name="price" class="form-control" id="price" value="{{ old('price') }}" required>
+            <input type="text" name="price" class="form-control" id="price" value="{{ old('price') }}" required>
         </div>
 
         <div class="form-group">

@@ -32,7 +32,7 @@
                     @csrf
                     <div class="mb-3">
                         <label for="user_id" class="form-label">User ID</label>
-                        <input type="number" class="form-control" id="user_id" name="user_id" required>
+                        <input type="number" class="form-control" id="user_id" name="user_id">
                     </div>
                     <div class="mb-3">
                         <label for="sport_center_id" class="form-label">Sport Center</label>

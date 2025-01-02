@@ -17,6 +17,7 @@ class Deal extends Model
         'location',
         'image_path',
         'status',
+        'reason'
     ];
 
     /**

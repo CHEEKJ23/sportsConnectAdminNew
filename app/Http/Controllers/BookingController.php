@@ -292,9 +292,8 @@ public function adminCreateBooking(Request $request)
         'sport_center_id' => 'required|exists:sport_centers,id',
         'court_id' => 'required|exists:courts,id',
         'date' => 'required|date',
-        'startTime' => 'required|regex:/^\d{1,2}:\d{1,2}$
-        /',
-        'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
+        'startTime' => 'required|regex:/^\d{2}:\d{2}$/', // Adjusted regex for HH:MM format
+        'endTime' => 'required|regex:/^\d{2}:\d{2}$/',   // Adjusted regex for HH:MM format
     ]);
 
     $startTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validatedData['startTime']));
@@ -346,7 +345,63 @@ public function getCourts($sportCenterId, $courtType)
 
     return response()->json($courts);
 }
+//admin
+//admin
+//admin
+//admin
+//admin
+//admin
+//admin
+//admin
+//admin
+public function searchCourtAvailability(Request $request)
+{
 
+    $validated = $request->validate([
+        'sport_center_name' => 'nullable|string',
+        'court_type' => 'nullable|string',
+        'date' => 'required|date',
+        'startTime' => 'required|regex:/^\d{2}:\d{2}$/',
+        'endTime' => 'required|regex:/^\d{2}:\d{2}$/',
+    ]);
+
+    $startTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validated['startTime']));
+    $endTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validated['endTime']));
+
+    if ($endTime->lessThanOrEqualTo($startTime)) {
+        $endTime->addDay();
+    }
+
+    $query = Court::query();
+
+    if (!empty($validated['sport_center_name'])) {
+        $query->whereHas('sportCenter', function ($q) use ($validated) {
+            $q->where('name', 'like', '%' . $validated['sport_center_name'] . '%');
+        });
+    }
+
+    if (!empty($validated['court_type'])) {
+        $query->where('type', $validated['court_type']);
+    }
+
+    $courts = $query->with(['sportCenter:id,name', 'bookings' => function ($q) use ($validated, $startTime, $endTime) {
+        $q->where('date', $validated['date'])
+          ->where(function ($q) use ($startTime, $endTime) {
+              $q->whereBetween('startTime', [$startTime->format('H:i'), $endTime->format('H:i')])
+                ->orWhereBetween('endTime', [$startTime->format('H:i'), $endTime->format('H:i')]);
+          });
+    }])->get();
+
+    return view('adminOverview', compact('courts', 'validated'));
+}
+
+public function showCourtAvailabilityForm()
+{
+    $courts = collect(); // Empty collection
+    $validated = []; // Empty array for validated data
+
+    return view('adminOverview', compact('courts', 'validated'));
+}
 
 }
 

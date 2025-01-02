@@ -73,7 +73,10 @@ Route::prefix('auth')
         Route::delete('/delete/deals/{dealID}', [DealsController::class, 'deleteDeal']);
         Route::get('/view/deals', [DealsController::class, 'viewAllDeals']);
         Route::get('/view/my-deals', [DealsController::class, 'viewMyDeals']);
-
+        //search deals
+        //search deals
+        //search deals
+        Route::get('/search-deals', [DealsController::class, 'searchDeals'])->name('api.searchDeals');
 
         //activities
         Route::post('/create/activities', [ActivityController::class, 'createActivity']);
@@ -101,6 +104,7 @@ Route::prefix('auth')
 
         //show user points
         Route::get('user/{userId}/points', [ActivityController::class, 'showUserPoints'])->name('api.user.points.show');
+        
     });
     
 

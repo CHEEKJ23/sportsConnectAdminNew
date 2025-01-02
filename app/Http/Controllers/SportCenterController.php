@@ -29,7 +29,7 @@ class SportCenterController extends Controller
             'description' => 'nullable|string',
             'location' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'price' => 'required|numeric',
+            'price' => 'required|string',
         ]);
 
         $imagePath = null;
@@ -70,7 +70,8 @@ class SportCenterController extends Controller
         'description' => 'nullable|string',
         'location' => 'required|string',
         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'price' => 'required|numeric',
+        'price' => 'required|string',
+
     ]);
 
     // Find the sport center by ID, or fail if not found

@@ -71,6 +71,10 @@
                                         <form action="{{ route('rejectDeal', $deal->dealID) }}" method="POST" style="display: inline; margin-left: 5px;">
                                             @csrf
                                             @method('PUT')
+                                            <div class="form-group">
+                                                <label for="reason-{{ $deal->dealID }}">Reason for Rejection:</label>
+                                                <input type="text" class="form-control" id="reason-{{ $deal->dealID }}" name="reason" required>
+                                            </div>
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to reject this deal?')">
                                                 Reject
                                             </button>

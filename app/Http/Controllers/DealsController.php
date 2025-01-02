@@ -132,6 +132,30 @@ private function awardPoints($userId, $points)
 return response()->json($deals);
 }
 
+public function searchDeals(Request $request)
+{
+    $validated = $request->validate([
+        'query' => 'nullable|string|max:255',
+    ]);
+
+    $userId = $request->user()->id; 
+
+    $query = Deal::query();
+
+    $query->where('userID', '!=', $userId);
+
+    if (!empty($validated['query'])) {
+        $query->where(function ($q) use ($validated) {
+            $q->where('title', 'like', '%' . $validated['query'] . '%')
+                ->orWhere('description', 'like', '%' . $validated['query'] . '%');
+        });
+    }
+
+    $deals = $query->with('user:id,name')->paginate(10);
+
+    return response()->json($deals);
+}
+
 ////////////////////ADMIN////////////////////
 ////////////////////ADMIN////////////////////
 ////////////////////ADMIN////////////////////
@@ -155,19 +179,25 @@ return response()->json($deals);
     }
 
     // Reject a deal
-    public function rejectDeal($dealID)
-    {
-        $deal = Deal::findOrFail($dealID);
+   public function rejectDeal(Request $request, $dealID)
+{
+    $deal = Deal::findOrFail($dealID);
 
-        if ($deal->status !== 'Pending') {
-            return response()->json(['message' => 'Deal is already processed'], 400);
-        }
-
-        $deal->update(['status' => 'Rejected']);
-
-        // return response()->json(['message' => 'Deal rejected successfully']);
-        return redirect()->route('showDeals')->with('message', 'Deal rejected successfully.');
+    if ($deal->status !== 'Pending') {
+        return response()->json(['message' => 'Deal is already processed'], 400);
     }
+
+    $validated = $request->validate([
+        'reason' => 'required|string|max:255', // Validate the reason input
+    ]);
+
+    $deal->update([
+        'status' => 'Rejected',
+        'reason' => $validated['reason'], // Save the reason
+    ]);
+
+    return redirect()->route('showDeals')->with('message', 'Deal rejected successfully.');
+}
  //show all deals
     public function showDeals()
 {

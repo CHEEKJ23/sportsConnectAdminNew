@@ -191,3 +191,12 @@ Route::post('/admin/bookings/create', [BookingController::class, 'adminCreateBoo
 
 Route::get('/admin/sport-centers/{sportCenterId}/court-types', [BookingController::class, 'getCourtTypes']);
 Route::get('/admin/sport-centers/{sportCenterId}/courts/{courtType}', [BookingController::class, 'getCourts']);
+
+
+
+
+// Display the search form
+Route::get('/admin/overview', [BookingController::class, 'showCourtAvailabilityForm'])->name('admin.overviewForm');
+
+// Process the search request
+Route::post('/admin/overview', [BookingController::class, 'searchCourtAvailability'])->name('admin.overview');
