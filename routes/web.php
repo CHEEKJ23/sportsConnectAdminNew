@@ -32,8 +32,11 @@ use App\Http\Controllers\CourtController;
 // });
 
 Auth::routes();
+Route::group(['middleware' => ['auth', 'admin']], function () {
+    Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+});
 
 // Auth::routes();
 
@@ -60,7 +63,7 @@ Route::get('/admin/user-list/remove/User/{id}', [App\Http\Controllers\UserContro
 Route::post('/admin/rentals/complete-return', [EquipmentRentalController::class, 'completeReturn'])->name('completeReturn');
 
 //manage deposit paid by user when renting at counter
-Route::post('/admin/rentals/receive-return-request', [EquipmentRentalController::class, 'updateDepositReturned'])->name('updateDepositReturned');
+// Route::post('/admin/rentals/receive-return-request', [EquipmentRentalController::class, 'updateDepositReturned'])->name('updateDepositReturned');
 
 //manage return (deposit and returned quantity)
 Route::post('/rentals/{rentalID}/process-return', [EquipmentRentalController::class, 'processReturn'])->name('rentals.processReturn');

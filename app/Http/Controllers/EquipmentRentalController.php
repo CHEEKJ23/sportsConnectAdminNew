@@ -9,6 +9,7 @@ use App\Models\EquipmentRental;
 use App\Models\User;
 use App\Models\UserPoints;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class EquipmentRentalController extends Controller
 {
@@ -283,10 +284,15 @@ public function processReturn(Request $request, $rentalID)
         return redirect()->back()->with('error', 'The deposit returned does not match the deposit paid.');
     }
 
-    // Calculate late fee
-    $actualReturnTime = now();
-    $lateHours = $actualReturnTime->diffInHours($rental->endTime, false);
-    $lateFee = $lateHours > 0 ? $lateHours * 10 : 0; 
+   // Ensure endTime is a Carbon instance
+$endTime = Carbon::parse($rental->endTime);
+
+// Calculate late fee
+$actualReturnTime = now();
+\Log::info('Current Time: ' . $actualReturnTime);
+
+$lateHours = $endTime->diffInHours($actualReturnTime, false); // Use Carbon instance
+$lateFee = $lateHours > 0 ? $lateHours * 10 : 0; 
 
     // Update equipment availability
     $equipment = Equipment::findOrFail($rental->equipmentID);
@@ -295,12 +301,13 @@ public function processReturn(Request $request, $rentalID)
     // Update rental details
     $rental->update([
         'rentalStatus' => 'Completed',
-        'actualReturnDateTime' => now(),
+        // 'actualReturnDateTime' => now(),
         'deposit_returned' => $validatedData['deposit_returned'],
         'lateFee' => $lateFee,
 
     ]);
-
+    \Log::info('Late Hours: ' . $lateHours);
+    \Log::info('Late Fee: ' . $lateFee);
     return redirect()->route('rentalReturns')->with('success', 'Return process completed successfully.');
 }
 //（admin）

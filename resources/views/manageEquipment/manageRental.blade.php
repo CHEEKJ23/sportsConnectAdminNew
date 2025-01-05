@@ -26,6 +26,7 @@
                     <th>Equipment Name</th>
                     <th>User</th>
                     <th>Quantity Rented</th>
+                    <th>Deposit Paid</th>
                     <th>Return Status</th>
                     <th>Action</th>
                 </tr>
@@ -38,6 +39,7 @@
                             <td>{{ $rental->equipment->name }}</td>
                             <td>{{ $rental->user->name }}</td>
                             <td>{{ $rental->quantity_rented }}</td>
+                            <td>{{ $rental->deposit_paid }}</td>
                             <td>{{ $rental->rentalStatus }}</td>
                             <td>
                                 <!-- Button to trigger modal -->

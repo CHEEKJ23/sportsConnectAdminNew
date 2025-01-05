@@ -47,7 +47,7 @@
                     <td>${{ $rental->equipment->deposit_amount }}</td>
                     <td>{{ $rental->rentalStatus }}</td>
                     <td>
-                        <form action="{{ route('updateDepositReturned', $rental->rentalID) }}" method="POST">
+                        <form action="{{ route('admin.rentals.updateDeposit', $rental->rentalID) }}" method="POST">
                             @csrf
                             <div class="input-group">
                                 <input type="number" name="deposit_paid" class="form-control" step="0.01" placeholder="Enter deposit" required>

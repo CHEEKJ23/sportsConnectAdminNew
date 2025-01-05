@@ -45,13 +45,13 @@ class UserController extends Controller
         $user=User::find($id);
         $user->delete();
         Session::flash('success',"user delete successfully!");
-        return redirect()->route('admin.userList');
+        return redirect()->route('userList');
     }
     public function deleteAdmin($id){
         $admin=User::find($id);
         $admin->delete();
         Session::flash('success',"admin create successfully!");
-        return redirect()->route('admin.adminList');
+        return redirect()->route('userList');
     }
 
     // search user

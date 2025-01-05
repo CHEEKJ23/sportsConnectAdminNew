@@ -210,6 +210,43 @@ public function updateBooking(Request $request, $bookingId)
     return response()->json(['message' => 'Booking updated successfully', 'booking' => $booking]);
 }
 
+
+
+// public function updateBooking(Request $request, $bookingId)
+// {
+//     $validatedData = $request->validate([
+//         'date' => 'required|date',
+//         'startTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
+//         'endTime' => 'required|regex:/^\d{1,2}:\d{1,2}$/',
+//         'court_id' => 'required|exists:courts,id', // New validation rule for court ID
+//     ]);
+//     $startTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validatedData['startTime']));
+//     $endTime = \Carbon\Carbon::createFromFormat('H:i', $this->formatTime($validatedData['endTime']));
+
+//     // Adjust endTime if it is earlier than startTime, assuming it belongs to the next day
+//     if ($endTime->lessThanOrEqualTo($startTime)) {
+//         $endTime->addDay();
+//     }
+//     $booking = Booking::where('id', $bookingId)
+//         ->where('user_id', $request->user()->id)
+//         ->firstOrFail();
+
+//     // Check if the new court is available for the new date and time
+//     $court = Court::findOrFail($validatedData['court_id']);
+//     $isAvailable = $court->isAvailable($validatedData['date'], $validatedData['startTime'], $validatedData['endTime']);
+
+//     if (!$isAvailable) {
+//         return response()->json(['message' => 'The selected court is not available for the selected time'], 409);
+//     }
+
+//     // Update the booking with the new court ID
+//     $booking->update($validatedData);
+
+//     return response()->json(['message' => 'Booking updated successfully', 'booking' => $booking]);
+// }
+
+
+
     // Step 4: Cancel a booking
     public function cancelBooking(Request $request, $bookingId)
 {
