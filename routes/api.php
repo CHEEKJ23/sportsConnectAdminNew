@@ -104,6 +104,7 @@ Route::prefix('auth')
 
         //show user points
         Route::get('user/{userId}/points', [ActivityController::class, 'showUserPoints'])->name('api.user.points.show');
+        // Route::post('/availableCourts/{sportCenterId}', [BookingController::class, 'getAvailableCourts']);
         
     });
     

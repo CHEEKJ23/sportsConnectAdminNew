@@ -9,15 +9,25 @@
 @section('content')
 <head>
     <!-- Bootstrap CSS -->
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    </head>
+</head>
+
 <!-- Button to trigger modal -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookingModal">
     Create Court Booking
 </button>
+
+@if(isset($bookings) && $bookings->count())
+    @foreach($bookings as $booking)
+        <div class="booking-item" id="booking-{{ $booking->id }}">
+            <!-- Booking details here -->
+            <button type="button" class="btn btn-danger cancel-booking" data-booking-id="{{ $booking->id }}">
+                Cancel Booking
+            </button>
+        </div>
+    @endforeach
+@endif
 
 <!-- Modal Structure -->
 <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
@@ -30,10 +40,10 @@
             <div class="modal-body">
                 <form id="bookingForm" action="{{ route('admin.bookings.create') }}" method="POST">
                     @csrf
-                    <div class="mb-3">
+                    {{-- <div class="mb-3">
                         <label for="user_id" class="form-label">User ID</label>
                         <input type="number" class="form-control" id="user_id" name="user_id">
-                    </div>
+                    </div> --}}
                     <div class="mb-3">
                         <label for="sport_center_id" class="form-label">Sport Center</label>
                         <select class="form-control" id="sport_center_id" name="sport_center_id" required>
@@ -74,9 +84,8 @@
     </div>
 </div>
 
-
-    <!-- Calendar Element -->
-    <div id="calendar"></div>
+<!-- Calendar Element -->
+<div id="calendar"></div>
 @stop
 
 @section('css')
@@ -85,7 +94,7 @@
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    {{-- <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
 
@@ -96,36 +105,41 @@
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                dateClick: function(info) {
+                    // Set the date in the booking form
+                    $('#date').val(info.dateStr);
+                    // Open the modal
+                    $('#bookingModal').modal('show');
+                },
+                eventClick: function(info) {
+                    var bookingId = info.event.id;
+                    if (confirm('Are you sure you want to cancel this booking?')) {
+                        $.ajax({
+                            url: '/admin/bookings/' + bookingId + '/cancel',
+                            type: 'POST',
+                            success: function(response) {
+                                alert(response.message);
+                                info.event.remove();
+                            },
+                            error: function(xhr) {
+                                alert('Error: ' + xhr.responseJSON.message);
+                            }
+                        });
+                    }
                 }
             });
 
             calendar.render();
         });
-    </script> --}}
-    <script>
-         document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
 
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                events: @json($events), // Ensure $events is passed from the controller
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                }
-            });
-
-            calendar.render();
-        });
         $(document).ready(function() {
-            // Set up CSRF token for AJAX requests
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-    
+
             $('#sport_center_id').change(function() {
                 var sportCenterId = $(this).val();
                 if (sportCenterId) {
@@ -141,7 +155,7 @@
                     });
                 }
             });
-    
+
             $('#court_type').change(function() {
                 var sportCenterId = $('#sport_center_id').val();
                 var courtType = $(this).val();
@@ -158,7 +172,7 @@
                     });
                 }
             });
-    
+
             $('#bookingForm').on('submit', function(e) {
                 e.preventDefault();
                 $.ajax({
@@ -168,11 +182,11 @@
                     success: function(response) {
                         alert(response.message);
                         $('#bookingForm')[0].reset();
+                        $('#bookingModal').modal('hide');
                         // Optionally, update the calendar or display a success message
                     },
                     error: function(xhr) {
                         alert('Error: ' + xhr.responseJSON.message);
-                        // Optionally, log the error or display it on the page
                     }
                 });
             });

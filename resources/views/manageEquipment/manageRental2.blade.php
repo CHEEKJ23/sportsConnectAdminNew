@@ -51,7 +51,7 @@
                             @csrf
                             <div class="input-group">
                                 <input type="number" name="deposit_paid" class="form-control" step="0.01" placeholder="Enter deposit" required>
-                                <button type="submit" class="btn btn-primary" {{ $rental->rentalStatus === 'Successful' ? 'disabled' : '' }}>Update</button>
+                                <button type="submit" class="btn btn-primary" {{ in_array($rental->rentalStatus, ['Successful', 'Completed']) ? 'disabled' : '' }}>Update</button>
                             </div>
                         </form>
                     </td>

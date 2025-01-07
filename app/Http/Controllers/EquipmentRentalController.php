@@ -150,7 +150,7 @@ class EquipmentRentalController extends Controller
             'rentalStatus' => 'Ongoing',
         ]);
         $equipment->decrement('quantity_available', $request->quantity_rented);
-        $this->awardPoints($request->user_id, 10); 
+        $this->awardPoints(Auth::id(), 10); 
 
         return response()->json(['message' => 'Rental created successfully', 'rental' => $rental], 201);
     }

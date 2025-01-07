@@ -203,3 +203,6 @@ Route::get('/admin/overview', [BookingController::class, 'showCourtAvailabilityF
 
 // Process the search request
 Route::post('/admin/overview', [BookingController::class, 'searchCourtAvailability'])->name('admin.overview');
+
+//cancel booking 
+Route::post('/admin/bookings/{id}/cancel', [BookingController::class, 'cancel'])->name('admin.bookings.cancel');
