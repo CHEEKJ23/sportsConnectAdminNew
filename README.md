@@ -53,5 +53,5 @@ Together, these features make Laravel an ideal choice for building a secure, sca
 
 ---
 
-## 📂 Project Structure
+
 
